@@ -1,0 +1,656 @@
+# Libraries for each plot
+
+1. Matplotlib:
+
+    - Scatter plot
+    - Pie Chart
+
+2. Pandas
+a
+    - Scatter Matrix
+    - Box Plotaa
+    - Histogram
+    - Density Chart
+    - Andrews Curve
+
+3. Seaborn
+
+    - Distplot / Histplot
+    - Joint Plot
+
+4. Plotly
+
+    - Line Chart
+    - Bubble Chart
+    - Parallel Chart
+
+```python
+# Read CSV
+df = pd.read_csv("filename")
+# For Numeric Columns Only
+df_numerics_only = df.select_dtypes(include=np.number)
+```
+
+```python
+# Load Dataset directly from SciKitLearn
+from sklearn import datasets
+
+iris = datasets.load_iris()
+df1 = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+```
+
+## Exp 1: Descriptive Statistics
+
+```python
+import pandas as pd
+import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+# Count/Mean/Median/Mode/Min/Max/Sum/Std/Var/Corelation Coeff:
+np.mean(df['column_name'])
+np.median(df['column_name'])
+stats.mode(df['column_name'])
+np.min(df['column_name'])
+np.max(df['column_name'])
+np.count(df['column_name'])
+np.sum(df['column_name'])
+np.std(df['column_name'])
+np.var(df['column_name'])
+np.corrcoef(df['column_name_1'], df['column_name_2'])
+
+# Range/Quartiles/Min/Max/Mean/Count/Std:
+np.ptp(df['column_name']) # range
+# for everything else
+df.column_name.describe()
+df.describe()
+
+# Standard Error of Mean
+stats.sem(df['column_name'])
+# OR
+df.column_name.std / (len(df.column_name)) ** 0.5
+
+# Coeff of Variation
+(df.column_name.std / df.column_name.mean) * 100
+# OR
+(np.std(df['column_name'], ddof=1) / np.mean(df['column_name'])) * 100
+
+# Null Values in every column
+df.isnull().sum()
+
+# Cumulative Percentage
+(df['column_name'].cumsum() / df['column_name'].sum()) * 100
+
+# Skewness/Kurtosis
+numeric_cols = df.select_dtypes(include=np.number).columns
+skewness = df[numeric_cols].skew()
+kurtosis = df[numeric_cols].kurtosis()
+
+# Trimmed Mean
+stats.trim_mean(df['column_name'], 0.1)
+
+# Sum of squares
+ssColumn = 0
+for i in range(len(df['column_name'])):
+    ssColumn += df['column_name'][i] ** 2
+print(ssColumn)
+
+# Box and Whisker Plot
+plt.boxplot(df["column_name"], vert=False)
+plt.xlabel("<text>")
+plt.title("<text>")
+plt.show()
+
+# Scatter Plot between fare amount and passenger count
+plt.scatter(df['column_name_1'], df['column_name_2'])
+plt.show()
+
+# Correlation Matrix
+# Convert date columns to datetime objects
+df['column_name'] = pd.to_datetime(df['column_name'])
+# Compute the correlation matrix for numeric columns only
+numeric_cols = df.select_dtypes(include=np.number).columns
+df_numeric = df[numeric_cols]
+correlation_matrix = df_numeric.corr()
+# Display the correlation matrix
+print(correlation_matrix)
+```
+
+## Exp 2: Data Imputation
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn import linear_model
+import scipy.stats as stats
+from sklearn.metrics import mean_squared_error
+
+# Find missing rows
+df.isnull().sum()
+
+# Remove null row
+df1 = df.dropna()
+print(df1)
+
+# Mean/Median/Mode/ Arbitary Value/Mode Imputation
+df1 = df.fillna(df.mean())
+df2 = df.fillna(df.median())
+df4 = df.fillna(df.mode().iloc[0])
+df3 = df.fillna(27)
+print(dfx)
+
+# End Of Tail Imputation
+df1 = df[['column1', 'column2', ....]]
+for i in df1:
+    eod = df[i].mean() + 3*df[i].std()
+    df[i] = df[i].fillna(eod)
+print(df1)
+
+# Random Sample Imputation
+def random_imputation(df1,column_name):
+    number_missing = df1.column_name.isnull().sum()
+    observed_values = df1.loc[df1.column_name.notnull(),column_name]
+    df1.loc[df1.column_name.isnull(),column_name + '_imp'] = np.random.choice(observed_values,number_missing,replace = True)
+    return df1
+
+df1 = df[['column1', 'column2', ....]]
+for i in df1:
+    df1[column_name + '_imp'] = df1.column_name
+    df1 = random_imputation(df1, column_name)
+print(df1)
+
+# OR
+df1 = df[['column1', 'column2', ....]]
+for i in df1:
+    df1[i].dropna().sample(df1[i].isnull().sum(),random_state=0)
+print(df1)
+
+# Linear Regression Imputation
+from sklearn.model_selection import train_test_split
+from  sklearn.impute import SimpleImputer, MissingIndicator
+X = new_df[['Evaporation', 'Cloud9am', 'Cloud3pm']]
+y = new_df['Pressure3pm']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 22)
+X_train_original = X_train.copy()
+X_test_original = X_test.copy()
+for var in ['Evaporation', 'Cloud9am', 'Cloud3pm']:
+    X_train[var + '_missing'] = np.where(X_train[var].isnull(), 1, 0)
+    X_test[var + '_missing'] = np.where(X_test[var].isnull(), 1, 0)
+X_train
+
+
+imputer = SimpleImputer(strategy="mean")
+X_train_original_transformed = imputer.fit_transform(X_train_original)
+X_test_original_transformed = imputer.transform(X_test_original)
+
+
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression()
+reg.fit(X_train_original_transformed, y_train)
+y_pred = reg.predict(X_test_original_transformed)
+y_pred
+```
+
+## Exp 3: Exploratory Data Analysis
+
+```python
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
+
+# Scatter plot
+plt.xlabel("distance")
+plt.ylabel("fare_amount")
+plt.scatter(df['distance'], df['fare_amount'], c ="blue")
+
+# Scatter Matrix
+pd.plotting.scatter_matrix(df)
+
+# Boxplot
+df.boxplot('column1', 'column2')
+
+#Quartile
+x2=df['fare_amount']
+x4=df['distance']
+data = pd.DataFrame({ "fare_amount": x2,"distance": x4})
+# Plot the dataframe
+ax = data[[ 'distance','fare_amount']].plot(kind='box', title='boxplot')
+
+#Distribution Chart / Distplot
+plt.figure(figsize=[15,4])
+sns.histplot(data=df,  x="column_name", bins=40, kde=True)
+
+#JoinPlot
+sns.jointplot(x ='distance', y ='fare_amount', data = df)
+
+# Histogram
+df['passenger_count'].hist()
+plt.show()
+
+# Pie Chart
+plt.pie(df.column_name.value_counts(),labels=df.column_name.unique(),autopct ='% 1.1f %%', shadow = True)
+plt.show()
+
+# Line Chart
+df1 = df.head(100)
+fig = px.line(df1, x="distance_range", y="fare_amount",color='passenger_count')
+fig.show()
+
+#Bubble Chart
+fig = px.scatter(df, x="distance_range", y="fare_amount", size="distance",color="passenger_count",  log_x=True, size_max=60)
+fig.show()
+
+#Density Chart
+df['passenger_count'].plot.density(color='green')
+plt.title('Density plot for passenger count')
+plt.show()
+
+#Parallel Chart
+df1 =df.sample(n=1000)
+fig = px.parallel_coordinates(df1, color="passenger_count",
+                              dimensions=['distance_range','fare_amount',],
+                              color_continuous_scale=px.colors.diverging.Tealrose,
+                              color_continuous_midpoint=2)
+fig.show()
+
+# Creating Andrews curves
+df1 = df[['distance','passenger_count','fare_amount']]
+df1=df1.sample(n=100)
+x = pd.plotting.andrews_curves(df1,'passenger_count')
+x.plot()
+plt.show()
+
+# Heatmap
+df_numeric = df.select_dtypes(include=np.number)
+corr = df_numeric_corr
+hm = sns.heatmap(corr, cmap="Blues", annot=True)
+plt.show()
+```
+
+## Exp 4: Supervised Models Performance Metrics
+
+```python
+
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, mean_absolute_percentage_error, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.model_selection import train_test_split
+import math
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('filename.csv')
+df.head()
+
+df = df.drop(columns=['column_name1','column_name2',...]) # drop multiple columns
+df.drop(columns="column_name") # drop single column
+
+y = df['column_name'] # Dependent Variable
+x = df[['column_name1','column_name2',...]] #Independent Variables
+X_train, X_test, y_train, y_test = train_test_split(x,y,test_size=0.67)
+
+dt = DecisionTreeClassifier()
+model = dt.fit(X_train, y_train)
+y_pred = dt.predict(X_test)
+# or
+rfc = RandomForestClassifier()
+
+print(classification_report(y_test, y_pred, target_names=["Prediction 1", "Prediction 2"]))
+
+cm = confusion_matrix(y_test,y_pred)
+cmDisply = ConfusionMatrixDisplay(cm)
+cmDisply.plot()
+plt.figure(figsize=(0.1,0.1))
+plt.show()
+
+MSE = np.square(np.subtract(y_test,y_pred)).mean()
+RMSE = math.sqrt(MSE)
+print("Root Mean Square Error: ", RMSE)
+print("Mean Absolute Percentage Error: ",mean_absolute_percentage_error(y_test,y_pred))
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+# Calculate precision
+precision = precision_score(y_test, y_pred, pos_label=0)
+print("Precision:", precision)
+# Calculate error rate error_rate = 1 - accuracy print("Error rate:", error_rate)
+# Calculate sensitivity
+sensitivity = recall_score(y_test, y_pred, pos_label=0)
+print("Sensitivity:", sensitivity)
+# Calculate specificity
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+specificity = tn / (tn+fp)
+print("Specificity:", specificity)
+# Calculate ROC AUC
+roc_auc = roc_auc_score(y_test, y_pred)
+print("ROC AUC:", roc_auc)
+# Calculate F1 score
+f1 = f1_score(y_test, y_pred, pos_label=0)
+print("F1 score:", f1)
+
+fpr=fp/(fp+tn)
+tpr=tp/(tp+fn)
+plt.plot(fpr, tpr, color='darkorange', label='ROC curve (area = %0.2f)' %roc_auc)
+plt.rcParams["figure.figsize"] = (20,10)
+plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic')
+plt.legend(loc="lower right")
+plt.show()
+```
+
+## Exp 5: Unsupervised Models Performance Metrics
+
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+target = df.fare_amount
+
+# K Means
+from sklearn.cluster import KMeans
+# Specify the number of clusters
+n_clusters = 2
+# Initialize the Means object
+kmeans = KMeans(n_clusters=n_clusters)
+# Fit the KMeans object to the data
+kmeans.fit(df)
+# Get the cluster labels and centroids
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_
+
+fig = plt.figure()
+ax = fig.add_subplot (111, projection='3d')
+# Plot the data points
+ax.scatter (df.fare_amount, df.distance, df.passenger_count, marker='x', c='b')
+# Set the axis labels
+ax.set_xlabel('fare_amount')
+ax.set_ylabel ('distance')
+ax.set_zlabel ('passenger_count')
+# Set the title
+plt.title("3D Scatter Plot")
+# Show the plot
+plt.show ()
+
+# Adjusted Rand Score
+from sklearn.metrics.cluster import adjusted_rand_score
+labels_true = target.values
+labels_pred = labels
+print(adjusted_rand_score(labels_true, labels_pred))
+
+# Mutual Info Score
+from sklearn.metrics import mutual_info_score
+print(mutual_info_score (labels_true, labels_pred))
+
+# Silhoutte Score
+from sklearn.metrics import silhouette_score
+print(silhouette_score(df, labels))
+```
+
+## Exp 6: Time Series Analysis
+
+```python
+import pandas as pd
+import numpy as np          # For mathematical calculations
+import matplotlib.pyplot as plt  # For plotting graphs
+import matplotlib as mpl
+mpl.rcParams['agg.path.chunksize'] = 10000
+from datetime import datetime    # To access datetime
+from pandas import Series        # To work on series
+get_ipython().run_line_magic('matplotlib', 'inline')
+import warnings                   # To ignore the warnings
+warnings.filterwarnings("ignore")
+import seaborn as sns
+
+df = pd.read_csv('UberEdited.csv')
+df.head()
+
+df['key'] = pd.to_datetime(df['key'])
+df = df[["key","fare_amount"]]
+
+train_original = df.sample(frac=0.67, random_state=25)
+test_original = df.drop(train_original.index)
+test_original = test_original.drop(columns="fare_amount")
+train = train_original.copy()
+test = test_original.copy()
+# X_train = train[['year', 'month', 'day', 'Hour', 'weekend']]  # Assuming these are your features
+# y_train = train['fare_amount']  # Assuming this is your target variable
+print(f"No. of training examples: {train_original.shape[0]}")
+print(f"No. of testing examples: {test_original.shape[0]}")
+
+for i in (train, test, test_original, train_original):
+    i['year']=i.key.dt.year
+    i['month']=i.key.dt.month
+    i['day']=i.key.dt.day
+    i['Hour']=i.key.dt.hour
+
+def applyer(row):
+    if row.dayofweek == 5 or row.dayofweek == 6:
+        return 1
+    else:
+        return 0
+
+temp2 = train['key'].apply(applyer)
+train['weekend']=temp2
+
+train.index = train['key']
+# df = train.drop(columns="key")
+# ts = df['fare_amount']
+plt.figure(figsize=(16,8))
+plt.bar(train['key'],train['fare_amount'], label='Fare Amount')
+plt.title('Time Series')
+plt.xlabel("Time(year-month)")
+plt.ylabel("Fare amount")
+plt.legend(loc='best')
+plt.tight_layout()
+# train
+
+year_uber = train.groupby(['year'])['year'].size()
+sns.barplot(x=year_uber.index, y=year_uber.values)
+
+year_uber=train.groupby(['month'])['month'].size()
+sns.barplot(x=year_uber.index, y=year_uber.values)
+
+year_uber=train.groupby(['weekend'])['weekend'].size()
+sns.barplot(x=year_uber.index, y=year_uber.values)
+
+sns.barplot(data=train, x="weekend", y="fare_amount")
+
+sns.barplot(data=train, x="Hour", y="fare_amount")
+
+# sns.barplot(data=train, x="Hour", y="distance")
+# sns.barplot(data=train, x="weekend", y="distance")
+```
+
+## Exp 7: Outlier/Anomaly Detection
+
+```python
+import pandas as pd
+import numpy as np
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# DBSCAN
+# Scale the data using standardization
+scaler = StandardScaler()
+X = scaler.fit_transform(df[['fare_amount', 'distance']])
+# Apply DBSCAN with eps=0.5 and min_samples=5
+db = DBSCAN(eps=0.25, min_samples=5).fit(X)
+# Identify outliers based on their cluster label (-1 indicates an outlier)
+outliers = df[db.labels_ == -1]
+# Print the outliers count
+print(outliers.count())
+
+# # OR
+scaler = StandardScaler()
+X = scaler.fit_transform(df)
+dbs = DBSCAN(eps=12.5, min_samples=4)
+model = dbs.fit(X)
+dbscanDs = df.copy()
+dbscanDs['Cluster'] = model.labels_
+# Identify outliers based on their cluster label (-1 indicates an outlier)
+outliers = df[dbs.labels_ == -1]
+print(outliers.count())
+dbscanDs.Cluster.value_counts()
+
+# KNN
+k = 5
+# Fit the KNN model on the High, Low, Open, Close, and Adj Close columns
+X = df[['fare_amount', 'distance']]
+nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='ball_tree').fit(X)
+distances, indices = nbrs.kneighbors(X)
+# Calculate the average distance to the k nearest neighbors for each data point
+avg_distances = distances[:,1:].mean(axis=1)
+# Set a threshold for outlier detection (e.g. 2 standard deviations above the mean)
+threshold = avg_distances.mean() + 2 * avg_distances.std()
+# Identify outliers based on the threshold
+outliers = df[avg_distances > threshold]
+# Print the outliers count
+print(outliers.count())
+```
+
+## Exp 8: SMOTE
+
+```python
+from imblearn.over_sampling import SMOTE
+from matplotlib import pyplot
+from numpy import where
+import pandas as pd
+
+df = pd.read_csv('Churn_Modelling.csv')
+df.head()
+
+import seaborn as sns
+
+data = df[['CreditScore', 'Age', 'Exited',]]
+print(data.head(10))
+sns.scatterplot(data = data, x ='CreditScore', y = 'Age', hue = 'Exited')
+
+from sklearn.preprocessing import LabelEncoder
+for col in df.columns:
+  if df[col].dtype == 'O':
+    label_encode = LabelEncoder()
+    df[col] = label_encode.fit_transform(df[col])
+df
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+#Splitting the data
+from sklearn.tree import DecisionTreeClassifier
+X_train, X_test, y_train, y_test = train_test_split(df.drop('Exited',axis=1), df['Exited'], test_size = 0.2, random_state = 101)
+
+clf = DecisionTreeClassifier()
+clf.fit(X_train,y_train)
+y_pred=clf.predict(X_test)
+print(classification_report(y_test, y_pred))
+
+smote = SMOTE(sampling_strategy='auto',k_neighbors=5,random_state = 101)
+X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
+
+clf.fit(X_oversample,y_oversample)
+y_predo=clf.predict(X_test)
+print(classification_report(y_test, y_predo))
+
+classifier = LogisticRegression()
+classifier.fit(X_train, y_train)
+
+print(classification_report(y_test, classifier.predict(X_test)))
+
+
+classifier.fit(X_oversample, y_oversample)
+print(classification_report(y_test, classifier.predict(X_test)))
+
+smote = SMOTE(random_state = 101)
+X, y = smote.fit_resample(df[['CreditScore', 'Age']], df['Exited'])
+#Creating a new Oversampling Data Frame
+df_oversampler = pd.DataFrame(X, columns = ['CreditScore', 'Age'])
+df_oversampler['Exited']=y
+print(df_oversampler.head())
+
+sns.countplot(data=df_oversampler,x='Exited')
+
+from collections import Counter
+X=df[['CreditScore', 'Age']]
+y=df['Exited']
+
+oversample = SMOTE()
+X, y = oversample.fit_resample(X, y)
+# summarize the new class distribution
+counter = Counter(y)
+print(counter)
+
+
+sns.scatterplot(data = df_oversampler, x ='CreditScore', y = 'Age', hue = 'Exited')
+
+```
+
+## Exp 9: Inferential Statistics
+
+```python
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from scipy.stats import ttest_ind, ttest_1samp, f_oneway
+from statsmodels.stats.weightstats import ztest
+
+# Z-test
+sample_mean = df['fare_amount'].mean()
+pop_mean =  7 # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+z_score = (sample_mean - pop_mean) / (sample_std / np.sqrt(n))
+p_value = stats.norm.sf(abs(z_score)) * 2  # two-tailed test
+print('Z-score:', z_score)
+print('P-value:', p_value)
+
+# T-test
+sample_mean = df['fare_amount'].mean()
+pop_mean = 7  # assumed population mean
+sample_std = df['fare_amount'].std()
+n = len(df)
+t_score, p_value = stats.ttest_1samp(df['fare_amount'], pop_mean)
+print('T-score:', t_score)
+print('P-value:', p_value)
+
+model = ols('fare_amount ~ C(passenger_count)', data=df).fit()
+anova_table = sm.stats.anova_lm(model, typ=2)
+print(anova_table)
+
+# 1 Sample T-Test
+t_stat, p_value = ttest_1samp(df['fare_amount'], 7)
+print("1-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+# 2 Sample T-Test
+sample1 = df[df['passenger_count'] == 5]['fare_amount']
+sample2 = df[df['passenger_count'] == 6]['fare_amount']
+t_stat, p_value = ttest_ind(sample1, sample2)
+print("2-sample t-test results:")
+print("t-statistic: ", t_stat)
+print("p-value: ", p_value)
+
+# ANOVA
+group1 = df[df['passenger_count'] == 1]['fare_amount']
+group2 = df[df['passenger_count'] == 2]['fare_amount']
+group3 = df[df['passenger_count'] == 3]['fare_amount']
+f_stat, p_value = f_oneway(group1, group2, group3)
+print("ANOVA results:")
+print("f-statistic: ", f_stat)
+print("p-value: ", p_value)
+```
