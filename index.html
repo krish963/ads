@@ -667,6 +667,84 @@ print("ANOVA results:")
 print("f-statistic: ", f_stat)
 print("p-value: ", p_value)
 ```
+
+# Example Question From PDF
+
+# Describe all columns and find mean, median, and mode of the ‘price’ column:
+import pandas as pd
+
+# Load the dataset
+diamonds_df = pd.read_csv('diamonds.csv')
+
+# Describe all columns
+column_description = diamonds_df.describe(include='all')
+
+# Find mean, median, and mode of the 'price' column
+price_mean = diamonds_df['price'].mean()
+price_median = diamonds_df['price'].median()
+price_mode = diamonds_df['price'].mode()
+
+print("Column Descriptions:")
+print(column_description)
+print("\nMean Price:", price_mean)
+print("Median Price:", price_median)
+print("Mode of Price:", price_mode)
+
+# Plot a boxplot of the column ‘depth’ and find quartiles, median, upper, and lower limits:
+import matplotlib.pyplot as plt
+
+# Plot boxplot of column 'depth'
+plt.boxplot(diamonds_df['depth'])
+plt.title('Boxplot of Depth')
+plt.show()
+
+# Find quartiles, median, upper, and lower limits
+quartiles = diamonds_df['depth'].quantile([0.25, 0.5, 0.75])
+lower_limit = quartiles[0.25] - 1.5 * (quartiles[0.75] - quartiles[0.25])
+upper_limit = quartiles[0.75] + 1.5 * (quartiles[0.75] - quartiles[0.25])
+
+print("Quartiles:", quartiles)
+print("Median:", diamonds_df['depth'].median())
+print("Lower Limit:", lower_limit)
+print("Upper Limit:", upper_limit)
+
+# Compare trimmed mean and mean of the ‘carat’ column, what do you infer from it?
+# Trimmed mean is a robust statistic that removes a specified percentage of data points from the high and low ends of a dataset before calculating the mean. Let's compare it with the regular mean:
+from scipy.stats import trim_mean
+
+# Calculate trimmed mean (5%) of 'carat' column
+trimmed_carat_mean = trim_mean(diamonds_df['carat'], proportiontocut=0.05)
+
+# Compare with regular mean
+carat_mean = diamonds_df['carat'].mean()
+
+print("Trimmed Mean of Carat (5%):", trimmed_carat_mean)
+print("Regular Mean of Carat:", carat_mean)
+
+# Plot a heatmap of all columns and list features having high correlation (above 0.7):
+import seaborn as sns
+
+# Plot heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(diamonds_df.corr(), annot=True, cmap='coolwarm', fmt=".2f")
+plt.title('Correlation Heatmap')
+plt.show()
+
+# List features having high correlation (above 0.7)
+high_correlation = diamonds_df.corr().abs().stack().reset_index().sort_values(0, ascending=False)
+high_correlation = high_correlation[high_correlation['level_0'] != high_correlation['level_1']]
+high_correlation = high_correlation[high_correlation[0] > 0.7]
+high_correlation.rename(columns={0: 'Correlation'}, inplace=True)
+
+print("Features with High Correlation (> 0.7):\n", high_correlation)
+
+# Plot a Bubble chart with ‘x’, ‘y’, and ‘z’ as features:
+plt.scatter(diamonds_df['x'], diamonds_df['y'], s=diamonds_df['z']*10, alpha=0.5)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Bubble Chart of x vs y (Bubble Size = z)')
+plt.show()
+
         </pre>
 </body>
 
