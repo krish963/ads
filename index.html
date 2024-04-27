@@ -11,741 +11,669 @@
 <body>
         <pre>
 
-# Libraries for each plot
-
-1. Matplotlib:
-
-    - Scatter plot
-    - Pie Chart
-
-2. Pandas
-a
-    - Scatter Matrix
-    - Box Plotaa
-    - Histogram
-    - Density Chart
-    - Andrews Curve
-
-3. Seaborn
-
-    - Distplot / Histplot
-    - Joint Plot
-
-4. Plotly
-
-    - Line Chart
-    - Bubble Chart
-    - Parallel Chart
-
-```python
-# Read CSV
-df = pd.read_csv("filename")
-# For Numeric Columns Only
-df_numerics_only = df.select_dtypes(include=np.number)
-```
-
-```python
-# Load Dataset directly from SciKitLearn
-from sklearn import datasets
-
-iris = datasets.load_iris()
-df1 = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
-```
-
-## Exp 1: Descriptive Statistics
-
-```python
-import pandas as pd
-import numpy as np
-from scipy import stats
-import matplotlib.pyplot as plt
-
-# Count/Mean/Median/Mode/Min/Max/Sum/Std/Var/Corelation Coeff:
-np.mean(df['column_name'])
-np.median(df['column_name'])
-stats.mode(df['column_name'])
-np.min(df['column_name'])
-np.max(df['column_name'])
-np.count(df['column_name'])
-np.sum(df['column_name'])
-np.std(df['column_name'])
-np.var(df['column_name'])
-np.corrcoef(df['column_name_1'], df['column_name_2'])
-
-# Range/Quartiles/Min/Max/Mean/Count/Std:
-np.ptp(df['column_name']) # range
-# for everything else
-df.column_name.describe()
-df.describe()
-
-# Standard Error of Mean
-stats.sem(df['column_name'])
-# OR
-df.column_name.std / (len(df.column_name)) ** 0.5
-
-# Coeff of Variation
-(df.column_name.std / df.column_name.mean) * 100
-# OR
-(np.std(df['column_name'], ddof=1) / np.mean(df['column_name'])) * 100
-
-# Null Values in every column
-df.isnull().sum()
-
-# Cumulative Percentage
-(df['column_name'].cumsum() / df['column_name'].sum()) * 100
-
-# Skewness/Kurtosis
-numeric_cols = df.select_dtypes(include=np.number).columns
-skewness = df[numeric_cols].skew()
-kurtosis = df[numeric_cols].kurtosis()
-
-# Trimmed Mean
-stats.trim_mean(df['column_name'], 0.1)
-
-# Sum of squares
-ssColumn = 0
-for i in range(len(df['column_name'])):
-    ssColumn += df['column_name'][i] ** 2
-print(ssColumn)
-
-# Box and Whisker Plot
-plt.boxplot(df["column_name"], vert=False)
-plt.xlabel("<text>")
-plt.title("<text>")
-plt.show()
-
-# Scatter Plot between fare amount and passenger count
-plt.scatter(df['column_name_1'], df['column_name_2'])
-plt.show()
-
-# Correlation Matrix
-# Convert date columns to datetime objects
-df['column_name'] = pd.to_datetime(df['column_name'])
-# Compute the correlation matrix for numeric columns only
-numeric_cols = df.select_dtypes(include=np.number).columns
-df_numeric = df[numeric_cols]
-correlation_matrix = df_numeric.corr()
-# Display the correlation matrix
-print(correlation_matrix)
-```
-
-## Exp 2: Data Imputation
-
-```python
-import pandas as pd
-import numpy as np
-from sklearn import linear_model
-import scipy.stats as stats
-from sklearn.metrics import mean_squared_error
-
-# Find missing rows
-df.isnull().sum()
-
-# Remove null row
-df1 = df.dropna()
-print(df1)
-
-# Mean/Median/Mode/ Arbitary Value/Mode Imputation
-df1 = df.fillna(df.mean())
-df2 = df.fillna(df.median())
-df4 = df.fillna(df.mode().iloc[0])
-df3 = df.fillna(27)
-print(dfx)
-
-# End Of Tail Imputation
-df1 = df[['column1', 'column2', ....]]
-for i in df1:
-    eod = df[i].mean() + 3*df[i].std()
-    df[i] = df[i].fillna(eod)
-print(df1)
-
-# Random Sample Imputation
-def random_imputation(df1,column_name):
-    number_missing = df1.column_name.isnull().sum()
-    observed_values = df1.loc[df1.column_name.notnull(),column_name]
-    df1.loc[df1.column_name.isnull(),column_name + '_imp'] = np.random.choice(observed_values,number_missing,replace = True)
-    return df1
-
-df1 = df[['column1', 'column2', ....]]
-for i in df1:
-    df1[column_name + '_imp'] = df1.column_name
-    df1 = random_imputation(df1, column_name)
-print(df1)
-
-# OR
-df1 = df[['column1', 'column2', ....]]
-for i in df1:
-    df1[i].dropna().sample(df1[i].isnull().sum(),random_state=0)
-print(df1)
-
-# Linear Regression Imputation
-from sklearn.model_selection import train_test_split
-from  sklearn.impute import SimpleImputer, MissingIndicator
-X = new_df[['Evaporation', 'Cloud9am', 'Cloud3pm']]
-y = new_df['Pressure3pm']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.3, random_state = 22)
-X_train_original = X_train.copy()
-X_test_original = X_test.copy()
-for var in ['Evaporation', 'Cloud9am', 'Cloud3pm']:
-    X_train[var + '_missing'] = np.where(X_train[var].isnull(), 1, 0)
-    X_test[var + '_missing'] = np.where(X_test[var].isnull(), 1, 0)
-X_train
-
-
-imputer = SimpleImputer(strategy="mean")
-X_train_original_transformed = imputer.fit_transform(X_train_original)
-X_test_original_transformed = imputer.transform(X_test_original)
-
-
-from sklearn.linear_model import LinearRegression
-reg = LinearRegression()
-reg.fit(X_train_original_transformed, y_train)
-y_pred = reg.predict(X_test_original_transformed)
-y_pred
-```
-
-## Exp 3: Exploratory Data Analysis
-
-```python
-
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import plotly.express as px
-
-# Scatter plot
-plt.xlabel("distance")
-plt.ylabel("fare_amount")
-plt.scatter(df['distance'], df['fare_amount'], c ="blue")
-
-# Scatter Matrix
-pd.plotting.scatter_matrix(df)
-
-# Boxplot
-df.boxplot('column1', 'column2')
-
-#Quartile
-x2=df['fare_amount']
-x4=df['distance']
-data = pd.DataFrame({ "fare_amount": x2,"distance": x4})
-# Plot the dataframe
-ax = data[[ 'distance','fare_amount']].plot(kind='box', title='boxplot')
-
-#Distribution Chart / Distplot
-plt.figure(figsize=[15,4])
-sns.histplot(data=df,  x="column_name", bins=40, kde=True)
-
-#JoinPlot
-sns.jointplot(x ='distance', y ='fare_amount', data = df)
-
-# Histogram
-df['passenger_count'].hist()
-plt.show()
-
-# Pie Chart
-plt.pie(df.column_name.value_counts(),labels=df.column_name.unique(),autopct ='% 1.1f %%', shadow = True)
-plt.show()
-
-# Line Chart
-df1 = df.head(100)
-fig = px.line(df1, x="distance_range", y="fare_amount",color='passenger_count')
-fig.show()
-
-#Bubble Chart
-fig = px.scatter(df, x="distance_range", y="fare_amount", size="distance",color="passenger_count",  log_x=True, size_max=60)
-fig.show()
-
-#Density Chart
-df['passenger_count'].plot.density(color='green')
-plt.title('Density plot for passenger count')
-plt.show()
-
-#Parallel Chart
-df1 =df.sample(n=1000)
-fig = px.parallel_coordinates(df1, color="passenger_count",
-                              dimensions=['distance_range','fare_amount',],
-                              color_continuous_scale=px.colors.diverging.Tealrose,
-                              color_continuous_midpoint=2)
-fig.show()
-
-# Creating Andrews curves
-df1 = df[['distance','passenger_count','fare_amount']]
-df1=df1.sample(n=100)
-x = pd.plotting.andrews_curves(df1,'passenger_count')
-x.plot()
-plt.show()
-
-# Heatmap
-df_numeric = df.select_dtypes(include=np.number)
-corr = df_numeric_corr
-hm = sns.heatmap(corr, cmap="Blues", annot=True)
-plt.show()
-```
-
-## Exp 4: Supervised Models Performance Metrics
-
-```python
-
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay, mean_absolute_percentage_error, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from sklearn.model_selection import train_test_split
-import math
-import matplotlib.pyplot as plt
-
-df = pd.read_csv('filename.csv')
-df.head()
-
-df = df.drop(columns=['column_name1','column_name2',...]) # drop multiple columns
-df.drop(columns="column_name") # drop single column
-
-y = df['column_name'] # Dependent Variable
-x = df[['column_name1','column_name2',...]] #Independent Variables
-X_train, X_test, y_train, y_test = train_test_split(x,y,test_size=0.67)
-
-dt = DecisionTreeClassifier()
-model = dt.fit(X_train, y_train)
-y_pred = dt.predict(X_test)
-# or
-rfc = RandomForestClassifier()
-
-print(classification_report(y_test, y_pred, target_names=["Prediction 1", "Prediction 2"]))
-
-cm = confusion_matrix(y_test,y_pred)
-cmDisply = ConfusionMatrixDisplay(cm)
-cmDisply.plot()
-plt.figure(figsize=(0.1,0.1))
-plt.show()
-
-MSE = np.square(np.subtract(y_test,y_pred)).mean()
-RMSE = math.sqrt(MSE)
-print("Root Mean Square Error: ", RMSE)
-print("Mean Absolute Percentage Error: ",mean_absolute_percentage_error(y_test,y_pred))
-accuracy = accuracy_score(y_test, y_pred)
-print("Accuracy:", accuracy)
-# Calculate precision
-precision = precision_score(y_test, y_pred, pos_label=0)
-print("Precision:", precision)
-# Calculate error rate 
-error_rate = 1 - accuracy 
-print("Error rate:", error_rate)
-# Calculate sensitivity
-sensitivity = recall_score(y_test, y_pred, pos_label=0)
-print("Sensitivity:", sensitivity)
-# Calculate specificity
-tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-specificity = tn / (tn+fp)
-print("Specificity:", specificity)
-# Calculate ROC AUC
-roc_auc = roc_auc_score(y_test, y_pred)
-print("ROC AUC:", roc_auc)
-# Calculate F1 score
-f1 = f1_score(y_test, y_pred, pos_label=0)
-print("F1 score:", f1)
-
-fpr=fp/(fp+tn)
-tpr=tp/(tp+fn)
-plt.plot(fpr, tpr, color='darkorange', label='ROC curve (area = %0.2f)' %roc_auc)
-plt.rcParams["figure.figsize"] = (20,10)
-plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver operating characteristic')
-plt.legend(loc="lower right")
-plt.show()
-```
-
-## Exp 5: Unsupervised Models Performance Metrics
-
-```python
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-target = df.fare_amount
-
-# K Means
-from sklearn.cluster import KMeans
-# Specify the number of clusters
-n_clusters = 2
-# Initialize the Means object
-kmeans = KMeans(n_clusters=n_clusters)
-# Fit the KMeans object to the data
-kmeans.fit(df)
-# Get the cluster labels and centroids
-labels = kmeans.labels_
-centroids = kmeans.cluster_centers_
-
-fig = plt.figure()
-ax = fig.add_subplot (111, projection='3d')
-# Plot the data points
-ax.scatter (df.fare_amount, df.distance, df.passenger_count, marker='x', c='b')
-# Set the axis labels
-ax.set_xlabel('fare_amount')
-ax.set_ylabel ('distance')
-ax.set_zlabel ('passenger_count')
-# Set the title
-plt.title("3D Scatter Plot")
-# Show the plot
-plt.show ()
-
-# Adjusted Rand Score
-from sklearn.metrics.cluster import adjusted_rand_score
-labels_true = target.values
-labels_pred = labels
-print(adjusted_rand_score(labels_true, labels_pred))
-
-# Mutual Info Score
-from sklearn.metrics import mutual_info_score
-print(mutual_info_score (labels_true, labels_pred))
-
-# Silhoutte Score
-from sklearn.metrics import silhouette_score
-print(silhouette_score(df, labels))
-```
-
-## Exp 6: Time Series Analysis
-
-```python
-import pandas as pd
-import numpy as np          # For mathematical calculations
-import matplotlib.pyplot as plt  # For plotting graphs
-import matplotlib as mpl
-mpl.rcParams['agg.path.chunksize'] = 10000
-from datetime import datetime    # To access datetime
-from pandas import Series        # To work on series
-get_ipython().run_line_magic('matplotlib', 'inline')
-import warnings                   # To ignore the warnings
-warnings.filterwarnings("ignore")
-import seaborn as sns
-
-df = pd.read_csv('UberEdited.csv')
-df.head()
-
-df['key'] = pd.to_datetime(df['key'])
-df = df[["key","fare_amount"]]
-
-train_original = df.sample(frac=0.67, random_state=25)
-test_original = df.drop(train_original.index)
-test_original = test_original.drop(columns="fare_amount")
-train = train_original.copy()
-test = test_original.copy()
-# X_train = train[['year', 'month', 'day', 'Hour', 'weekend']]  # Assuming these are your features
-# y_train = train['fare_amount']  # Assuming this is your target variable
-print(f"No. of training examples: {train_original.shape[0]}")
-print(f"No. of testing examples: {test_original.shape[0]}")
-
-for i in (train, test, test_original, train_original):
-    i['year']=i.key.dt.year
-    i['month']=i.key.dt.month
-    i['day']=i.key.dt.day
-    i['Hour']=i.key.dt.hour
-
-def applyer(row):
-    if row.dayofweek == 5 or row.dayofweek == 6:
-        return 1
+#IPC
+#Server.py
+import socket
+
+try:
+    # Create a server socket
+    server_address = ("localhost", 5000)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.bind(server_address)
+        server_socket.listen(1)
+        print("Server is running and waiting for a client...")
+
+        # Accept a client connection
+        client_socket, client_address = server_socket.accept()
+        print("Client connected!")
+
+        # Input and output streams for communication
+        with client_socket.makefile("r") as in_stream, client_socket.makefile(
+            "w"
+        ) as out_stream:
+            while True:
+                # Receive message from client
+                client_message = in_stream.readline().strip()
+                if not client_message:
+                    break
+                print("Client:", client_message)
+
+                # Get server response
+                server_response = input("Server: ")
+
+                # Send response to client
+                out_stream.write(server_response + "\n")
+                out_stream.flush()
+
+except ConnectionError as e:
+    print(e)
+
+#Client.py
+import socket
+
+try:
+    # Establish connection to server
+    server_address = ("localhost", 5000)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        client_socket.connect(server_address)
+        print("Connected to server!")
+
+        # Input and output streams for communication
+        with client_socket.makefile("r") as in_stream, client_socket.makefile(
+            "w"
+        ) as out_stream:
+            while True:
+                # Get user input
+                message = input("Client: ")
+                if not message:
+                    break
+
+                # Send message to server
+                out_stream.write(message + "\n")
+                out_stream.flush()
+
+                # Receive response from server
+                server_response = in_stream.readline().strip()
+                print("Server:", server_response)
+
+except ConnectionError as e:
+    print(e)
+
+
+#GROUP COMMUNICATION
+#ChatServer.java
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+public class ChatServer {
+    private static final int PORT = 12345;
+    private static Set<PrintWriter> writers = new HashSet<>();
+
+    public static void main(String[] args) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server is running...");
+            while (true) {
+                new Handler(serverSocket.accept()).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static class Handler extends Thread {
+        private Socket socket;
+        private PrintWriter writer;
+        private String name;
+
+        public Handler(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                writer = new PrintWriter(socket.getOutputStream(), true);
+
+                // Get client's name
+                writer.println("Enter your name: ");
+                name = reader.readLine();
+                broadcast(name + " has joined the chat\n");
+
+                writers.add(writer);
+
+                // Receive messages from client and broadcast them
+                String message;
+                while ((message = reader.readLine()) != null) {
+                    broadcast(name + ": " + message);
+                }
+            } catch (IOException e) {
+                System.out.println(e);
+            } finally {
+                if (name != null) {
+                    writers.remove(writer);
+                    broadcast(name + " has left the chat");
+                }
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+    }
+
+    private static void broadcast(String message) {
+        for (PrintWriter writer : writers) {
+            writer.println(message);
+        }
+    }
+}
+
+#Client.java (Run this file multiple times instead of creating multiple client files)
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class ChatClient {
+    private static final String SERVER_ADDRESS = "localhost";
+    private static final int PORT = 12345;
+
+    public static void main(String[] args) {
+        try (
+            Socket socket = new Socket(SERVER_ADDRESS, PORT);
+            BufferedReader serverIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), true);
+            Scanner scanner = new Scanner(System.in)
+        ) {
+            // Read and print messages from the server
+            new Thread(() -> {
+                try {
+                    String message;
+                    while ((message = serverIn.readLine()) != null) {
+                        System.out.println(message);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // Send messages to the server
+            String name = scanner.nextLine();
+            serverOut.println(name); // Send client's name to the server
+            while (true) {
+                serverOut.println(scanner.nextLine());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+            
+#GlobalAveraging
+from datetime import datetime, timedelta
+
+class Node:
+  def __init__(self, current_time):
+    self.current_time = current_time
+    self.sync_diffs = []
+
+  def minute_clock(self):
+    self.current_time += timedelta(minutes=1)
+
+  def store_sync_diff(self, sync_time):
+    self.sync_diffs.append((self.current_time - sync_time).total_seconds() // 60)
+
+  def adjust_to_global_avg(self):
+    self.global_avg = sum(self.sync_diffs) / len(self.sync_diffs)
+    self.current_time -= timedelta(minutes=self.global_avg)
+
+nodes = []
+
+# current_time = datetime.now().replace(second=0, microsecond=0)
+current_time = datetime.now().replace(hour=10, minute=15, second=0, microsecond=0)
+
+nodes.append(Node(current_time))
+nodes.append(Node(current_time - timedelta(minutes=5)))
+nodes.append(Node(current_time - timedelta(minutes=3)))
+nodes.append(Node(current_time - timedelta(minutes=6)))
+
+t0 =  current_time
+r = timedelta(minutes=15)
+
+sync_time = t0 + r
+
+print(f"\nSync Time: {sync_time}\n")
+
+def display_node_times():
+  for i in range(len(nodes)):
+    print(f"Node {i+1}: {nodes[i].current_time} ({(nodes[i].current_time - sync_time).total_seconds() // 60})")
+
+def minute_clock_all_nodes():
+  for node in nodes: node.minute_clock()
+
+def get_nodes_at_sync_time():
+  synced_nodes = []
+  for node in nodes:
+
+    if node.current_time.hour == sync_time.hour and node.current_time.minute == sync_time.minute:
+      synced_nodes.append(node)
+  return synced_nodes
+
+def store_sync_diff():
+  for node in nodes: node.store_sync_diff(sync_time)
+
+print("Initial time:")
+display_node_times()
+print()
+
+time_diff_mins = 0
+for i in range(30):
+  minute_clock_all_nodes()
+  time_diff_mins += 1
+
+  sync_nodes = get_nodes_at_sync_time()
+  if sync_nodes:
+    store_sync_diff()
+    print("After", time_diff_mins, "mins,")
+    display_node_times()
+    print()
+    time_diff_mins = 0
+
+print("Performing global averaging...")
+for i in range(len(nodes)):
+  node = nodes[i]
+  node.adjust_to_global_avg()
+  print("Node", i+1, ":", node.current_time, f"({node.global_avg})")
+
+
+#BERKLEY
+def time(s):
+    ans = s.split(":")
+    return int(ans[0]) * 60 + int(ans[1]) + int(ans[2])/60
+
+slaves=int(input("Enter the number of clients : "))
+
+master = input("Enter the Time of master node : ")
+masterTime=time(master)
+print(masterTime)
+
+ls = []
+
+for i in range(slaves):
+    x = input(f"Enter the clock time for slave {i + 1} : ")
+    print(time(x))
+    ls.append(time(x))
+
+def get_time(val):
+    hours = int(val // 60)
+    mins = int(val - hours * 60)
+    seconds = int((val - int(val)) * 60)
+    return str(hours) + ":" +  str(mins) + ":" + str(seconds)
+
+def berkeley_sync(master_time, client_times):
+    clients=[time-master_time for time in client_times]
+    print(clients)
+    avg_time = sum(clients) / (len(client_times)+1)
+    print(avg_time)
+
+    masterAdjustedTime=master_time+avg_time
+
+    adjusted_times = [masterAdjustedTime - time for time in client_times]
+
+    print(masterAdjustedTime)
+    print(get_time(masterAdjustedTime))
+
+    return adjusted_times,masterAdjustedTime
+
+ans, mat=berkeley_sync(masterTime,ls)
+print(ans)
+for i in range(slaves):
+    print(f"Time for slave {i+1} : {get_time(ls[i]+ans[i])}")
+
+print(f"Time of master node : {get_time(mat)}")
+
+
+#BULLY
+import random
+
+pc = int(input("Total number of processes: "))
+bit_string = input("Bit String: ")
+initiator_process_id = int(input("Enter Initiator Process ID: "))
+print()
+initiator_process_index = initiator_process_id - 1
+
+print("Initiator sends request to others...\n")
+for pid in range(initiator_process_id+1, pc+1):
+  print(initiator_process_id, "sends election request to", pid)
+print()
+
+print("Initiator receives response from other nodes...\n")
+for pid in range(initiator_process_id+1, pc+1):
+  p_index = pid - 1
+  if bit_string[p_index] == "1":
+    print(initiator_process_id, " receives OK from", pid)
+print()
+
+count_dict = {}
+for pid in range(initiator_process_id+1, pc):
+  pindex = pid - 1
+  if bit_string[pindex] == "1":
+    count_dict[pid] = pc - pid
+
+req_count_dict = count_dict.copy()
+
+print("Other nodes send election request messages to higher node...\n")
+while req_count_dict:
+  sender_pid, req_pending = random.choice(list(req_count_dict.items()))
+  req_pending -= 1
+  receiver_pid = pc - req_pending
+  print(f"{sender_pid} sends election request to {receiver_pid}")
+  req_count_dict[sender_pid] = req_pending
+  if req_pending == 0: del req_count_dict[sender_pid]
+print()
+
+res_count_dict = count_dict.copy()
+
+print("Other nodes send election request messages to higher node...\n")
+while res_count_dict:
+  sender_pid, req_pending = random.choice(list(res_count_dict.items()))
+  req_pending -= 1
+  receiver_pid = pc - req_pending
+  receiver_pindex = receiver_pid - 1
+  if bit_string[receiver_pindex] == "1":
+    print(f"{sender_pid} receives OK from {receiver_pid}")
+  else:
+    print(f"{sender_pid} does not receive response from {receiver_pid}")
+  res_count_dict[sender_pid] = req_pending
+  if req_pending == 0: del res_count_dict[sender_pid]
+print()
+
+print("Declaration of leader node by every node...\n")
+leader_pindex = bit_string.rindex("1")
+leader_pid = leader_pindex + 1
+for pid in range(initiator_process_id, pc+1):
+  if bit_string[pindex] == "1":
+    print(pid, "declares", leader_pid, "as coordinator/leader")
+
+
+#RAYMOND
+n = int(input("Enter the number of nodes: "))
+print()
+request_queue = {i: [] for i in range(n)}
+holder = {i: int(input(f"Enter holder for node {i}: ")) for i in range(n)}
+print()
+token = {i: int(input(f"Enter token status for node {i}: ")) for i in range(n)}
+print()
+adj_matrix = []
+print("Enter the adjacency matrix for the spanning tree (row-wise):")
+for _ in range(n):
+  row = list(map(int, input().split()))
+  adj_matrix.append(row)
+
+print("\nRaymond Tree based Mutual Exclusion")
+print("\nAdjacency Matrix for the spanning tree:\n")
+for row in adj_matrix:
+  print(*row)
+
+req_process = int(input("\nEnter the process that wants to enter the CS: "))
+
+def find_parent(req_process):
+  request_queue[req_process].append(req_process)
+  for i in range(n):
+    if adj_matrix[req_process][i] == 1:
+      parent = i
+      request_queue[parent].append(req_process)
+      break
+  print("\nProcess {} sending Request to parent Process {}".format(req_process, parent))
+  print(f"\nRequest Queue: {request_queue}")
+  if token[parent] == 1:
+    return parent
+  else:
+    parent = find_parent(parent)
+    return parent
+
+parent = find_parent(req_process)
+
+while token[req_process] != 1:
+  child = request_queue[parent][0]
+  request_queue[parent].pop(0)
+  holder[parent] = child
+  holder[child] = 0
+  token[parent] = 0
+  token[child] = 1
+  print("\nParent process {} has the token and sends the token to the request process {}".format(parent, child))
+  print(f"\nRequest Queue: {request_queue}")
+  parent = child
+
+if token[parent] == 1 and request_queue[parent][0] == parent:
+  request_queue[parent].pop(0)
+  holder[parent] = parent
+  print("\nProcess {} enters the Critical Section".format(parent))
+  print(f"\nRequest Queue: {request_queue}")
+
+if len(request_queue[parent]) == 0:
+  print("\nRequest queue of process {} is empty. Therefore Release Critical Section".format(parent))
+
+print(f"\nHolder: {holder}")
+
+
+#RICART
+numProcesses = int(input("Enter number of processes: "))
+numCS = int(input("Enter Number of processes that want to enter CS: "))
+print()
+processMap = {}
+timestamps = []
+for i in range(numCS):
+    process, timestamp = input(f"Enter the Process ID and Timestamp of process: ").split()
+    processMap[int(timestamp)] = int(process)
+    timestamps.append(int(timestamp))
+print()
+timestamps.sort()
+for time in timestamps:
+    processCS = processMap[time]
+    for i in range(numProcesses):
+        if(processCS != i):
+            print(f"Process {processCS} has requested Process {i}")
+    print()
+for time in timestamps:
+    processCS = processMap[time]
+    for i in range(numProcesses):
+        if(processCS != i):
+            print(f"Process {i} has Accepted the request of process {processCS}")
+    print(f'\nProcess {processCS} has now entered the CS')
+    print(f'Process {processCS} has now exited the CS\n')
+
+
+#BANKERS
+def add_lists(list1, list2):
+  result = []
+  for i in range(len(list1)):
+    result.append(list1[i] + list2[i])
+  return result
+
+def subtract_lists(list1, list2):
+  result = []
+  for i in range(len(list1)):
+    result.append(list1[i] - list2[i])
+  return result
+
+def all_zeros(list):
+  for value in list:
+    if value != 0:
+      return False
+  return True
+
+def is_greater_or_equal(list1, list2):
+  for i in range(len(list1)):
+    if list1[i] < list2[i]:
+      return False
+  return True
+
+numProcesses = int(input("Enter the no. of Processes: "))
+numResources = int(input("Enter the no. of Resources: "))
+
+resourceMap = {}
+maxMap = {}
+allocMap = {}
+needMap = {}
+totalResources = []
+
+for i in range(numResources):
+  resourceUnits = int(input(f"\nEnter the no. of resources for R{i+1}: "))
+  resourceMap[i] = resourceUnits
+  totalResources.append(resourceUnits)
+
+print("\nEnter the Max Resources:")
+for i in range(numProcesses):
+  print(f"  Process {i+1}: ", end="")
+  processMax = list(map(int, input().split()))
+  maxMap[i] = processMax
+
+print("\nEnter the Allocated Resources:")
+sumAlloc = [0] * numResources
+for i in range(numProcesses):
+  print(f"  Process {i+1}: ", end="")
+  processAlloc = list(map(int, input().split()))
+  allocMap[i] = processAlloc
+  sumAlloc = add_lists(sumAlloc, processAlloc)
+
+print("\nNeed Matrix:")
+for i in range(numProcesses):
+  max_vals = maxMap[i]
+  alloc_vals = allocMap[i]
+  need_vals = subtract_lists(max_vals, alloc_vals)
+  needMap[i] = need_vals
+  print(f"P{i+1}: {need_vals}")
+
+availableResources = subtract_lists(totalResources, sumAlloc)
+print(f"\nResources Remaining: {availableResources}")
+
+executedOrder = []
+for i in range(numProcesses):
+  for j in range(numProcesses):
+    if j in needMap:
+      if all_zeros(needMap[j]):
+        print(f"\nProcess {j+1} has executed and resources have been made available")
+        availableResources = add_lists(availableResources, allocMap[j])
+        print(f"Available Resources: {availableResources}")
+        executedOrder.append(j)
+        del needMap[j]
+        continue
+      if is_greater_or_equal(availableResources, needMap[j]):
+        print(f"\nProcess {j+1} has executed and resources have been made available")
+        availableResources = add_lists(availableResources, allocMap[j])
+        print(f"Available Resources: {availableResources}")
+        executedOrder.append(j)
+        del needMap[j]
+
+if len(executedOrder) == numProcesses:
+  print(f"\nSystem is in a safe state.\nSafe Sequence: {executedOrder}")
+else:
+  print("\nSystem is unsafe.")
+
+
+#LOAD BALANCING
+process_count = int(input("Enter the number of processes: "))
+server_count = int(input("Enter the number of servers: "))
+
+while True:
+    general_server_process_count = process_count // server_count
+    extra_process_server_count = process_count % server_count
+    general_server_count =  server_count - extra_process_server_count
+    extra_process_count = general_server_process_count + 1
+    print("\nCurrent status of processes in distributed system:\n")
+    for i in range(extra_process_server_count):
+        print(f"Server {i+1} now handles {extra_process_count} processes")
+    for i in range(extra_process_server_count, server_count):
+        print(f"Server {i+1} now handles {general_server_process_count} processes")
+
+    option = int(input("\nMenu\n1. Add Servers\n2. Remove Servers\n3. Add Processes\n4. Remove Processes\n5. Exit\nYour choice: "))
+
+    print()
+
+    if option == 1:
+        add_servers = int(input("Enter the no. of Servers to add: "))
+        server_count += add_servers
+    elif option == 2:
+        rem_servers = int(input("Enter the no. of Servers to remove: "))
+        if (server_count - rem_servers) <= 0:
+          print("Atleast One Server is required!")
+          continue
+        server_count -= rem_servers
+    elif option == 3:
+        add_processes = int(input("Enter the no. of Processes to add: "))
+        process_count += add_processes
+    elif option == 4:
+        rem_processes = int(input("Enter the no. of Processes to remove: "))
+        if (process_count - rem_processes) < 0:
+          print("The no. of Processes cannot be negative!")
+          continue
+        process_count -= rem_processes
     else:
-        return 0
-
-temp2 = train['key'].apply(applyer)
-train['weekend']=temp2
-
-train.index = train['key']
-# df = train.drop(columns="key")
-# ts = df['fare_amount']
-plt.figure(figsize=(16,8))
-plt.bar(train['key'],train['fare_amount'], label='Fare Amount')
-plt.title('Time Series')
-plt.xlabel("Time(year-month)")
-plt.ylabel("Fare amount")
-plt.legend(loc='best')
-plt.tight_layout()
-# train
-
-year_uber = train.groupby(['year'])['year'].size()
-sns.barplot(x=year_uber.index, y=year_uber.values)
-
-year_uber=train.groupby(['month'])['month'].size()
-sns.barplot(x=year_uber.index, y=year_uber.values)
-
-year_uber=train.groupby(['weekend'])['weekend'].size()
-sns.barplot(x=year_uber.index, y=year_uber.values)
-
-sns.barplot(data=train, x="weekend", y="fare_amount")
-
-sns.barplot(data=train, x="Hour", y="fare_amount")
-
-# sns.barplot(data=train, x="Hour", y="distance")
-# sns.barplot(data=train, x="weekend", y="distance")
-```
-
-## Exp 7: Outlier/Anomaly Detection
-
-```python
-import pandas as pd
-import numpy as np
-from sklearn.cluster import DBSCAN
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import NearestNeighbors
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# DBSCAN
-# Scale the data using standardization
-scaler = StandardScaler()
-X = scaler.fit_transform(df[['fare_amount', 'distance']])
-# Apply DBSCAN with eps=0.5 and min_samples=5
-db = DBSCAN(eps=0.25, min_samples=5).fit(X)
-# Identify outliers based on their cluster label (-1 indicates an outlier)
-outliers = df[db.labels_ == -1]
-# Print the outliers count
-print(outliers.count())
-
-# # OR
-scaler = StandardScaler()
-X = scaler.fit_transform(df)
-dbs = DBSCAN(eps=12.5, min_samples=4)
-model = dbs.fit(X)
-dbscanDs = df.copy()
-dbscanDs['Cluster'] = model.labels_
-# Identify outliers based on their cluster label (-1 indicates an outlier)
-outliers = df[dbs.labels_ == -1]
-print(outliers.count())
-dbscanDs.Cluster.value_counts()
-
-# KNN
-k = 5
-# Fit the KNN model on the High, Low, Open, Close, and Adj Close columns
-X = df[['fare_amount', 'distance']]
-nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='ball_tree').fit(X)
-distances, indices = nbrs.kneighbors(X)
-# Calculate the average distance to the k nearest neighbors for each data point
-avg_distances = distances[:,1:].mean(axis=1)
-# Set a threshold for outlier detection (e.g. 2 standard deviations above the mean)
-threshold = avg_distances.mean() + 2 * avg_distances.std()
-# Identify outliers based on the threshold
-outliers = df[avg_distances > threshold]
-# Print the outliers count
-print(outliers.count())
-```
-
-## Exp 8: SMOTE
-
-```python
-from imblearn.over_sampling import SMOTE
-from matplotlib import pyplot
-from numpy import where
-import pandas as pd
-
-df = pd.read_csv('Churn_Modelling.csv')
-df.head()
-
-import seaborn as sns
-
-data = df[['CreditScore', 'Age', 'Exited',]]
-print(data.head(10))
-sns.scatterplot(data = data, x ='CreditScore', y = 'Age', hue = 'Exited')
-
-from sklearn.preprocessing import LabelEncoder
-for col in df.columns:
-  if df[col].dtype == 'O':
-    label_encode = LabelEncoder()
-    df[col] = label_encode.fit_transform(df[col])
-df
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-#Splitting the data
-from sklearn.tree import DecisionTreeClassifier
-X_train, X_test, y_train, y_test = train_test_split(df.drop('Exited',axis=1), df['Exited'], test_size = 0.2, random_state = 101)
-
-clf = DecisionTreeClassifier()
-clf.fit(X_train,y_train)
-y_pred=clf.predict(X_test)
-print(classification_report(y_test, y_pred))
-
-smote = SMOTE(sampling_strategy='auto',k_neighbors=5,random_state = 101)
-X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
-
-clf.fit(X_oversample,y_oversample)
-y_predo=clf.predict(X_test)
-print(classification_report(y_test, y_predo))
-
-classifier = LogisticRegression()
-classifier.fit(X_train, y_train)
-
-print(classification_report(y_test, classifier.predict(X_test)))
+        break
 
 
-classifier.fit(X_oversample, y_oversample)
-print(classification_report(y_test, classifier.predict(X_test)))
+#MULTITHREADING
+# ******************************************* SERVER *******************************************
 
-smote = SMOTE(random_state = 101)
-X, y = smote.fit_resample(df[['CreditScore', 'Age']], df['Exited'])
-#Creating a new Oversampling Data Frame
-df_oversampler = pd.DataFrame(X, columns = ['CreditScore', 'Age'])
-df_oversampler['Exited']=y
-print(df_oversampler.head())
-
-sns.countplot(data=df_oversampler,x='Exited')
-
-from collections import Counter
-X=df[['CreditScore', 'Age']]
-y=df['Exited']
-
-oversample = SMOTE()
-X, y = oversample.fit_resample(X, y)
-# summarize the new class distribution
-counter = Counter(y)
-print(counter)
+import socket
+import threading
 
 
-sns.scatterplot(data = df_oversampler, x ='CreditScore', y = 'Age', hue = 'Exited')
+def broadcast(message, clients):
+    for client in clients:
+        try:
+            client.send(message.encode("utf-8"))
+        except:
+            # Handle exceptions if a client connection is no longer valid
+            clients.remove(client)
 
-```
 
-## Exp 9: Inferential Statistics
+def handle_client(client_socket, clients):
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            message = data.decode("utf-8")
+            print(f"Received message: {message}")
+            broadcast(message, clients)
+        except:
+            # Handle exceptions if a client connection is no longer valid
+            clients.remove(client_socket)
+            break
 
-```python
-import pandas as pd
-import numpy as np
-import scipy.stats as stats
-import statsmodels.api as sm
-from statsmodels.formula.api import ols
-from scipy.stats import ttest_ind, ttest_1samp, f_oneway
-from statsmodels.stats.weightstats import ztest
 
-# Z-test
-sample_mean = df['fare_amount'].mean()
-pop_mean =  7 # assumed population mean
-sample_std = df['fare_amount'].std()
-n = len(df)
-z_score = (sample_mean - pop_mean) / (sample_std / np.sqrt(n))
-p_value = stats.norm.sf(abs(z_score)) * 2  # two-tailed test
-print('Z-score:', z_score)
-print('P-value:', p_value)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(("0.0.0.0", 8888))
+server.listen(5)
+print("[*] Listening on 0.0.0.0:8888")
+clients = []
+while True:
+    client_socket, addr = server.accept()
+    print(f"[*] Accepted connection from {addr[0]}:{addr[1]}")
+    clients.append(client_socket)
+    client_handler = threading.Thread(target=handle_client, args=(client_socket, clients))
+    client_handler.start()
 
-# T-test
-sample_mean = df['fare_amount'].mean()
-pop_mean = 7  # assumed population mean
-sample_std = df['fare_amount'].std()
-n = len(df)
-t_score, p_value = stats.ttest_1samp(df['fare_amount'], pop_mean)
-print('T-score:', t_score)
-print('P-value:', p_value)
+# ******************************************* CLIENT *******************************************
+# Replace 1 in client, receive_thread, send_thread with corresponding client number
 
-model = ols('fare_amount ~ C(passenger_count)', data=df).fit()
-anova_table = sm.stats.anova_lm(model, typ=2)
-print(anova_table)
+import socket
+import threading
 
-# 1 Sample T-Test
-t_stat, p_value = ttest_1samp(df['fare_amount'], 7)
-print("1-sample t-test results:")
-print("t-statistic: ", t_stat)
-print("p-value: ", p_value)
 
-# 2 Sample T-Test
-sample1 = df[df['passenger_count'] == 5]['fare_amount']
-sample2 = df[df['passenger_count'] == 6]['fare_amount']
-t_stat, p_value = ttest_ind(sample1, sample2)
-print("2-sample t-test results:")
-print("t-statistic: ", t_stat)
-print("p-value: ", p_value)
+def receive_messages(client_socket):
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            message = data.decode("utf-8")
+            print(f"\nReceived broadcast: {message}")
+        except:
+            break
 
-# ANOVA
-group1 = df[df['passenger_count'] == 1]['fare_amount']
-group2 = df[df['passenger_count'] == 2]['fare_amount']
-group3 = df[df['passenger_count'] == 3]['fare_amount']
-f_stat, p_value = f_oneway(group1, group2, group3)
-print("ANOVA results:")
-print("f-statistic: ", f_stat)
-print("p-value: ", p_value)
-```
 
-# Example Question From PDF
+def send_message(client_socket):
+    while True:
+        message = input("Enter message to broadcast (type 'exit' to quit): ")
+        if message.lower() == "exit":
+            break
+        client_socket.send(message.encode("utf-8"))
 
-# Describe all columns and find mean, median, and mode of the ‘price’ column:
-import pandas as pd
 
-# Load the dataset
-diamonds_df = pd.read_csv('diamonds.csv')
+client1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client1.connect(("127.0.0.1", 8888))
+receive_thread1 = threading.Thread(target=receive_messages, args=(client1,))
+receive_thread1.start()
+send_thread1 = threading.Thread(target=send_message, args=(client1,))
+send_thread1.start()
+receive_thread1.join()
+send_thread1.join()
+client1.close()
 
-# Describe all columns
-column_description = diamonds_df.describe(include='all')
-
-# Find mean, median, and mode of the 'price' column
-price_mean = diamonds_df['price'].mean()
-price_median = diamonds_df['price'].median()
-price_mode = diamonds_df['price'].mode()
-
-print("Column Descriptions:")
-print(column_description)
-print("\nMean Price:", price_mean)
-print("Median Price:", price_median)
-print("Mode of Price:", price_mode)
-
-# Plot a boxplot of the column ‘depth’ and find quartiles, median, upper, and lower limits:
-import matplotlib.pyplot as plt
-
-# Plot boxplot of column 'depth'
-plt.boxplot(diamonds_df['depth'])
-plt.title('Boxplot of Depth')
-plt.show()
-
-# Find quartiles, median, upper, and lower limits
-quartiles = diamonds_df['depth'].quantile([0.25, 0.5, 0.75])
-lower_limit = quartiles[0.25] - 1.5 * (quartiles[0.75] - quartiles[0.25])
-upper_limit = quartiles[0.75] + 1.5 * (quartiles[0.75] - quartiles[0.25])
-
-print("Quartiles:", quartiles)
-print("Median:", diamonds_df['depth'].median())
-print("Lower Limit:", lower_limit)
-print("Upper Limit:", upper_limit)
-
-# Compare trimmed mean and mean of the ‘carat’ column, what do you infer from it?
-# Trimmed mean is a robust statistic that removes a specified percentage of data points from the high and low ends of a dataset before calculating the mean. Let's compare it with the regular mean:
-from scipy.stats import trim_mean
-
-# Calculate trimmed mean (5%) of 'carat' column
-trimmed_carat_mean = trim_mean(diamonds_df['carat'], proportiontocut=0.05)
-
-# Compare with regular mean
-carat_mean = diamonds_df['carat'].mean()
-
-print("Trimmed Mean of Carat (5%):", trimmed_carat_mean)
-print("Regular Mean of Carat:", carat_mean)
-
-# Plot a heatmap of all columns and list features having high correlation (above 0.7):
-import seaborn as sns
-
-# Plot heatmap
-plt.figure(figsize=(10, 8))
-sns.heatmap(diamonds_df.corr(), annot=True, cmap='coolwarm', fmt=".2f")
-plt.title('Correlation Heatmap')
-plt.show()
-
-# List features having high correlation (above 0.7)
-high_correlation = diamonds_df.corr().abs().stack().reset_index().sort_values(0, ascending=False)
-high_correlation = high_correlation[high_correlation['level_0'] != high_correlation['level_1']]
-high_correlation = high_correlation[high_correlation[0] > 0.7]
-high_correlation.rename(columns={0: 'Correlation'}, inplace=True)
-
-print("Features with High Correlation (> 0.7):\n", high_correlation)
-
-# Plot a Bubble chart with ‘x’, ‘y’, and ‘z’ as features:
-plt.scatter(diamonds_df['x'], diamonds_df['y'], s=diamonds_df['z']*10, alpha=0.5)
-plt.xlabel('x')
-plt.ylabel('y')
-plt.title('Bubble Chart of x vs y (Bubble Size = z)')
-plt.show()
 
         </pre>
 </body>
