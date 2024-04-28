@@ -355,7 +355,7 @@ print()
 
 res_count_dict = count_dict.copy()
 
-print("Other nodes send election request messages to higher node...\n")
+print("Higher nodes reply to election request messages...\n")
 while res_count_dict:
   sender_pid, req_pending = random.choice(list(res_count_dict.items()))
   req_pending -= 1
